@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0c1830">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="ERC計算機">
+<meta name="description" content="16桁のERCコードから8桁の結果を算出する個人用計算機">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<title>ERC計算機</title>
+<style>
+:root{color-scheme:dark;--bg:#091322;--panel:#122139;--line:#2a3c58;--text:#f5f8ff;--muted:#aabbd3;--accent:#44c3b4;--red:#ff98a3}
+*{box-sizing:border-box}body{margin:0;min-height:100svh;background:radial-gradient(ellipse at top,#1a3555 0%,var(--bg) 62%);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text);padding:env(safe-area-inset-top) 18px calc(28px + env(safe-area-inset-bottom))}
+main{max-width:460px;margin:0 auto;padding-top:clamp(34px,9vh,88px)}.logo{display:flex;align-items:center;gap:13px;margin-bottom:34px}.mark{width:48px;height:48px;display:grid;place-items:center;background:#174641;border:1px solid #337e74;border-radius:14px;color:#85f0d7;font-weight:850;font-size:19px;letter-spacing:-1px}.eyebrow{margin:0 0 3px;color:var(--accent);letter-spacing:.17em;font-size:11px;font-weight:750}h1{font-size:25px;margin:0;letter-spacing:.01em}.sub{font-size:14px;line-height:1.8;color:var(--muted);margin:0 0 23px}.card{background:rgba(18,33,57,.96);border:1px solid var(--line);border-radius:20px;padding:24px 21px;box-shadow:0 16px 45px #030d1b70}.label{display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:700;margin-bottom:12px}.count{font-variant-numeric:tabular-nums;color:var(--muted);font-size:12px}input{width:100%;background:#081526;border:1px solid #425572;border-radius:12px;outline:none;color:white;font:650 21px/1.2 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.075em;padding:17px 13px;text-transform:uppercase;min-width:0}input:focus{border-color:var(--accent);box-shadow:0 0 0 3px #44c3b425}input::placeholder{color:#65758b;letter-spacing:0;font-size:16px}.hint{color:var(--muted);font-size:12px;margin:10px 0 20px;line-height:1.6}.primary{display:block;width:100%;border:0;border-radius:12px;padding:17px;font-size:16px;font-weight:760;background:var(--accent);color:#062326;cursor:pointer;touch-action:manipulation}.primary:active{transform:translateY(1px)}.primary:disabled{opacity:.4;cursor:not-allowed}.error{color:var(--red);font-size:13px;min-height:20px;margin:10px 0 0}.result{border-top:1px solid var(--line);margin-top:22px;padding-top:23px}.result[hidden]{display:none}.result-title{font-size:12px;color:var(--muted);font-weight:700}.result-code{font:750 clamp(29px,9vw,41px)/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.13em;color:#8ef9dd;overflow-wrap:anywhere}.secondary{width:100%;padding:13px;background:#233b50;border:1px solid #3c6673;border-radius:11px;color:#ecffff;font-weight:700;font-size:14px;cursor:pointer}.foot{margin-top:23px;color:#92a5c1;font-size:12px;line-height:1.8;text-align:center}.install{margin-top:19px;padding:16px;border:1px solid #2c4861;border-radius:14px;background:#0e2035;color:#b9cce0;font-size:12px;line-height:1.8}.install strong{color:#eef9ff}.offline{display:inline-block;border:1px solid #2b796f;border-radius:30px;padding:3px 9px;color:#82d9cd;font-size:11px;margin-left:5px}
+</style>
+</head>
+<body><main>
+<div class="logo"><div class="mark">ERC</div><div><p class="eyebrow">PERSONAL UTILITY</p><h1>ERC計算機</h1></div></div>
+<p class="sub">16桁の16進数を入力すると、8桁のERCコードを計算します。<span class="offline">オフライン計算</span></p>
+<section class="card" aria-label="ERCコード計算">
+<form id="form" novalidate>
+<div class="label"><label for="source">入力コード（16桁）</label><span class="count" id="counter">0 / 16</span></div>
+<input id="source" type="text" maxlength="16" inputmode="text" autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="16桁を入力" aria-describedby="hint error">
+<p class="hint" id="hint">使用できる文字：0〜9、A〜F（小文字も可）</p>
+<button class="primary" id="calculate" type="submit">ERCコードを計算する</button>
+<p class="error" id="error" role="alert" aria-live="polite"></p>
+</form>
+<div class="result" id="result" hidden aria-live="polite">
+<div class="result-title">計算結果</div>
+<div class="result-code" id="output"></div>
+<button type="button" id="copy" class="secondary">結果をコピー</button>
+</div>
+</section>
+<div class="install"><strong>iPhoneのホーム画面に追加</strong><br>HTTPSで公開したページをSafariで開き、共有ボタン →「ホーム画面に追加」を選択してください。<br>※ファイルアプリ内のプレビューでは操作できない場合があります。</div>
+<p class="foot">個人利用向け・端末内で計算します。<br>入力コードや計算結果は送信・保存されません。</p>
+</main>
+<script>
+'use strict';
+const input=document.getElementById('source'),counter=document.getElementById('counter'),error=document.getElementById('error'),result=document.getElementById('result'),output=document.getElementById('output'),copy=document.getElementById('copy');
+function reverse32(n){let r=0;for(let i=0;i<32;i++){r=(r*2)+(n%2);n=Math.floor(n/2)}return r>>>0}
+function calculateERC(code){if(!/^[0-9A-Fa-f]{16}$/.test(code))throw Error('16桁の16進数を入力してください。');const a=parseInt(code.slice(0,8),16)>>>0;const b=parseInt(code.slice(8,16),16)>>>0;const val=((a^reverse32(b))-234949137)>>>0;return val.toString(16).toUpperCase().padStart(8,'0')}
+window.calculateERC=calculateERC;
+function refresh(){input.value=input.value.toUpperCase();counter.textContent=input.value.length+' / 16';error.textContent='';result.hidden=true}
+input.addEventListener('input',refresh);
+document.getElementById('form').addEventListener('submit',e=>{e.preventDefault();const code=input.value.trim();if(!/^[0-9A-F]{16}$/.test(code)){error.textContent='16桁の16進数（0〜9、A〜F）を入力してください。';result.hidden=true;input.focus();return}output.textContent=calculateERC(code);copy.textContent='結果をコピー';result.hidden=false});
+copy.addEventListener('click',async()=>{const value=output.textContent;try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(value)}else{const t=document.createElement('textarea');t.value=value;t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.select();if(!document.execCommand('copy'))throw Error('copy unsupported');t.remove()}copy.textContent='コピーしました'}catch(e){copy.textContent='コピーできません。長押しで選択してください'}setTimeout(()=>copy.textContent='結果をコピー',2400)});
+if('serviceWorker'in navigator&&/^https?:$/.test(location.protocol)){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}))}
+</script>
+</body></html>
